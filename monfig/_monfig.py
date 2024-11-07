@@ -94,7 +94,6 @@ def condition(v):
             first = first & condition(c)
         return first
     raise RuntimeError(f'Not supported type {type(v)}. Try to create constraint manually')
-C = condition
 
 def OR(*args):
     iterator = iter(args)
@@ -230,7 +229,6 @@ class TreeConstraint(Constraint):
             return True
         self.set_error(msg)
         return False
-tC = TreeConstraint
 
 class GeneralConstraint(TreeConstraint):
     def __init__(self, func, *args, **kwargs):
@@ -252,7 +250,6 @@ class GeneralConstraint(TreeConstraint):
                 self.set_error(msg)
                 r = False
         return r
-fC = GeneralConstraint
 
 class FutureConstraint(GeneralConstraint):
     def __init__(self, func, *args, **kwargs):
@@ -273,8 +270,6 @@ class FutureConstraint(GeneralConstraint):
             if isinstance(self.right, FutureConstraint):
                 self.right.set_env(self.ENV)
         return super().match(value)
-ftC = FutureConstraint
-
 
 def get_types_name(t):
     return f"({', '.join(map(lambda x:getattr(x, '__name__', str(x)), t))})"
@@ -292,7 +287,6 @@ class TypeConstraint(GeneralConstraint):
                 return False
         super().__init__(func)
         self.error = f'should match one of the types in {get_types_name(expected_types)}'
-TpC = TypeConstraint
 
 class RangeConstraint(GeneralConstraint):
     def __init__(self, min=float('-inf'), max=float('inf'), allow_equals=False):
@@ -307,7 +301,6 @@ class RangeConstraint(GeneralConstraint):
         super().__init__(compare)
         _e = ['[', ']'] if allow_equals else ['(', ')']
         self.error = f'should be in range {_e[0]}{self.min}, {self.max}{_e[1]}'
-RgC = RangeConstraint
 
 class StringPatternConstraint(GeneralConstraint):
     def __init__(self, pattern, match_func='fullmatch', flags=0):
@@ -316,7 +309,6 @@ class StringPatternConstraint(GeneralConstraint):
         self.match_func = match_func
         super().__init__(getattr(self.p, match_func))
         self.error = f'should match pattern "{self.pattern}" (f={self.match_func}, flags={flags})'
-PtC = StringPatternConstraint
 
 class RulesBrokenError(RuntimeError):
     pass
