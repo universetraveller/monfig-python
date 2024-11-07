@@ -151,14 +151,14 @@ class Constraint:
         return c
 
     def __or__(self, obj):
-        c = self.merge(obj, op=operator.or_)
+        c = self.merge(obj, op=OPERATOR_OR)
         return self | condition(obj) if c is None else c
 
     def __ror__(self, obj):
         return self | obj
 
     def __and__(self, obj):
-        c = self.merge(obj, op=operator.and_)
+        c = self.merge(obj, op=OPERATOR_AND)
         return self & condition(obj) if c is None else c
     
     def __rand__(self, obj):
@@ -225,6 +225,7 @@ class TreeConstraint(Constraint):
             _msg.extend(msg)
             _msg.append('END_OR')
             self.set_error(_msg)
+            return False
         if not msg:
             return True
         self.set_error(msg)
@@ -241,9 +242,15 @@ class GeneralConstraint(TreeConstraint):
     def match(self, value):
         r = super().match(value)
         if r is default:
-            r = self.func(value, *self.args, **self.kwargs)
-            if not r and self.error is DEFAULT_ERROR:
-                self.set_error(f'could not pass function {self.func.__qualname__}')
+            try:
+                r = self.func(value, *self.args, **self.kwargs)
+                if not r and self.error is DEFAULT_ERROR:
+                    self.set_error(f'could not pass function {self.func.__qualname__}')
+            except Exception as e:
+                msg = [str(e)]
+                extend_or_append(msg, self.error)
+                self.set_error(msg)
+                r = False
         return r
 fC = GeneralConstraint
 
