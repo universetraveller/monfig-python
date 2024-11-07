@@ -121,7 +121,7 @@ setup(
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: Implementation :: CPython',
-        'Topic :: Software Development'
+        'Topic :: Software Development',
         'Topic :: Software Development :: Libraries :: Python Modules'
     ],
     # $ setup.py publish support.
